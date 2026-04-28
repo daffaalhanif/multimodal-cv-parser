@@ -1,6 +1,16 @@
-from pydantic import BaseModel, Field
-from typing import Optional, List
-from parser.validator import validasi
+from typing import Annotated, Optional, List
+from pydantic import BaseModel, Field, AfterValidator
+
+
+def _cek_kosong(value: str) -> str:
+    """Validasi nilai tidak boleh kosong atau hanya spasi."""
+    if not value.strip():
+        raise ValueError("Field tidak boleh kosong atau hanya spasi")
+    return value
+
+
+# Custom type -- str dengan validasi tidak boleh kosong
+validasi = Annotated[str, AfterValidator(_cek_kosong)]
 
 
 class Experience(BaseModel):
@@ -34,5 +44,5 @@ class CVOutput(BaseModel):
 
     nama: validasi
     experience: List[Experience] = Field(default_factory=list)
-    education: List[Education]   = Field(default_factory=list)
+    education: List[Education] = Field(default_factory=list)
     skills: Skills
