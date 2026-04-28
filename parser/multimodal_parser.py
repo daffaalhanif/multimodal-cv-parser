@@ -6,8 +6,6 @@ from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, SystemMessage
 
-from models.schema import CVOutput
-
 load_dotenv()
 
 
@@ -71,7 +69,7 @@ def encode_image(image_path: str) -> str:
         return base64.b64encode(f.read()).decode("utf-8")
 
 
-def parse_cv(images_base64: list[str]) -> CVOutput:
+def parse_cv(images_base64: list[str]) -> dict:
     """Kirim semua halaman CV ke GPT-4o via LangChain dan ekstrak data terstruktur.
 
     Semua halaman dikirim dalam satu API call agar model bisa melihat
@@ -81,11 +79,10 @@ def parse_cv(images_base64: list[str]) -> CVOutput:
         images_base64: List of base64-encoded PNG string, satu item per halaman CV.
 
     Returns:
-        Instance CVOutput Pydantic yang sudah tervalidasi.
+        Dict mentah hasil parsing LLM, belum divalidasi.
 
     Raises:
         json.JSONDecodeError: Jika model mengembalikan JSON yang tidak valid.
-        ValueError: Jika response tidak sesuai dengan schema CVOutput.
     """
     # Susun content -- semua halaman masuk dulu, prompt di akhir
     content = []
@@ -121,4 +118,4 @@ def parse_cv(images_base64: list[str]) -> CVOutput:
 
     raw_dict = json.loads(raw_text.strip())
 
-    return CVOutput(**raw_dict)
+    return raw_dict

@@ -2,6 +2,7 @@ import gradio as gr
 
 from utils.file_handler import load_file
 from parser.multimodal_parser import parse_cv
+from parser.validator import validate
 
 
 def process_cv(files):
@@ -19,7 +20,8 @@ def process_cv(files):
         images = load_file(file.name)
         masuk.extend(images)
 
-    hasil = parse_cv(masuk)
+    raw_dict = parse_cv(masuk)
+    hasil = validate(raw_dict)
     return hasil.model_dump()
 
 
