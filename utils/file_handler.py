@@ -15,6 +15,9 @@ def load_file(file_path: str) -> list[str]:
 
     if ext not in SUPPORTED_EXTENSIONS:
         raise ValueError(f"Format file tidak didukung: {ext}")
+    
+    if ext == ".pdf":
+        return _pdf_to_base64(file_path)
     else:
         return [_image_to_base64(file_path)]
     
