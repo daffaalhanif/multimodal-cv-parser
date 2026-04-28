@@ -12,7 +12,11 @@ def process_cv(files):
         files: List file yang diupload dari Gradio.
 
     Returns:
-        Dict hasil parsing CV.
+        Dict hasil parsing CV yang sudah tervalidasi.
+    
+    Raises:
+        json.JSONDecodeError: Jika model mengembalikan JSON yang tidak valid.
+        ValueError: Jika output tidak sesuai schema CVOutput.
     """
     masuk = []
 
