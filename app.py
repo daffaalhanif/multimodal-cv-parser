@@ -1,46 +1,48 @@
 import gradio as gr
-from parser.multimodal_parser import parse_cv, encode_image
-from pdf2image import convert_from_path
 
-def change_pdf(files):
+from utils.file_handler import load_file
+from parser.multimodal_parser import parse_cv
+
+
+def process_cv(files):
+    """Proses file CV yang diupload dan return hasil parsing sebagai JSON.
+
+    Args:
+        files: List file yang diupload dari Gradio.
+
+    Returns:
+        Dict hasil parsing CV.
+    """
     masuk = []
-    
+
     for file in files:
-        filename = file.name.lower()
-        
-        if filename.endswith(".pdf"):
-            file_pdf = convert_from_path(file.name)
-        
-            for i, halaman in enumerate(file_pdf):
-                temp_path = f"sementara_page_{i}.png"
-                halaman.save(temp_path, "PNG")
-                masuk.append(encode_image(temp_path))
-        
-        elif filename.endswith((".png", ".jpg", ".jpeg")):
-            masuk.append(encode_image(file.name))
-            
+        images = load_file(file.name)
+        masuk.extend(images)
+
     hasil = parse_cv(masuk)
     return hasil.model_dump()
 
+
 with gr.Blocks() as demo:
-    gr.Markdown("# CV detetction system")
-    gr.Markdown("## deteksi cv dri pdf atau image")
-    gr.Markdown("Upload file")
-    
+    gr.Markdown("# CV Detection System")
+    gr.Markdown("## Deteksi CV dari PDF atau Image")
+    gr.Markdown("Upload file CV kamu di bawah ini")
+
     with gr.Row():
         with gr.Column():
             file_input = gr.File(
                 file_types=["image", ".pdf"],
                 file_count="multiple",
                 label="Upload CV"
-                )
-            ocr_btn = gr.Button("Anaalisis cv")
+            )
+            ocr_btn = gr.Button("Analisis CV")
         with gr.Column():
             output_ocr = gr.JSON()
-    
+
     ocr_btn.click(
-        fn=change_pdf,
+        fn=process_cv,
         inputs=file_input,
         outputs=output_ocr
     )
+
 demo.launch()
