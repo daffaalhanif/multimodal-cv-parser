@@ -1,9 +1,22 @@
-from typing import Annotated
-from pydantic import AfterValidator, BaseModel, ValidationError
+from pydantic import ValidationError
 
-def cek_kosong(value: str) -> str:
-    if not value.strip():
-        raise ValueError("Tidak boleh kosong")
-    return value
+from models.schema import CVOutput
 
-validasi = Annotated[str, AfterValidator(cek_kosong)]
+
+def validate(raw_dict: dict) -> CVOutput:
+    """Validasi output LLM terhadap schema CVOutput.
+
+    Args:
+        raw_dict: Dict mentah dari LLM parser.
+
+    Returns:
+        Instance CVOutput yang sudah tervalidasi.
+
+    Raises:
+        ValueError: Jika dict tidak sesuai schema CVOutput.
+    """
+    try:
+        return CVOutput(**raw_dict)
+    except ValidationError as e:
+        raise ValueError(f"Validasi output gagal:\n{e}")
+    
